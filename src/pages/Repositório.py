@@ -2,8 +2,13 @@ import streamlit as st
 import numpy as np
 import pandas as pd
 from io import BytesIO
+import functions.similarity as similarity
 
 from firebase import get_db
+
+if st.session_state["authentication_status"] != True:
+    st.title("Favor realizar login para acessar esta página 🔐")
+    st.stop()
 
 st.set_page_config(
     page_title="Repositório",
@@ -70,12 +75,21 @@ if compare_btn:
     dd1, dd2 = mainbody3.columns([1,1])
     selected_blobs = [blobs[k] for k, x in enumerate(selected) if x]
     
+    # names_tabs = ["Filtrado"]
+    # df_tabs = [""]
+    # for x in selected_blobs:
+    #     names_tabs.append(x.name)
+    #     df_tabs.append(pd.read_excel(BytesIO(x.download_as_string())))
+    # tabs = st.tabs(names_tabs)
+    # for element, df in zip(tabs, df_tabs):
+    #     element.write(df)
+
     blob0 = [x for x in selected_blobs if x.name.endswith(new_btn)][0]
     data0 = BytesIO(blob0.download_as_string())
     df0 = pd.read_excel(data0)
 
-    d2.write(blob0.name.split('/')[-1])
-    dd2.dataframe(df0, hide_index=True, use_container_width=True)
+    # d2.write(blob0.name.split('/')[-1])
+    # dd2.dataframe(df0, hide_index=True, use_container_width=True)
 
     dftotal = pd.DataFrame()
     names = []
@@ -86,7 +100,25 @@ if compare_btn:
         datax = BytesIO(x.download_as_string())
         dfx = pd.read_excel(datax)
         dftotal = pd.concat([dftotal, dfx], ignore_index=True)
-    
-    d1.write(', '.join(names))
-    dd1.dataframe(dftotal, hide_index=True, use_container_width=True)
 
+    if len(selected_blobs) == 2:
+        tab = st.tabs(["Filtrado", "Raw", "Filtrado GPT"])
+        df_filtred, df_raw = similarity.process(dftotal)
+        tab[0].dataframe(df_filtred)
+        tab[1].dataframe(df_raw)
+        
+        df_gpt = similarity.compare(df_filtred, dftotal)
+        tab[2].dataframe(df_gpt)
+
+
+    # d1.write(', '.join(names))
+    # dd1.dataframe(dftotal, hide_index=True, use_container_width=True)
+
+    # df_filtred = similarity.compare()
+    # df_filtred_1, yyy = similarity.process(df0)
+    # df_filtred_2, y = similarity.process(dftotal)
+    
+    # tab1, tab2 = st.tabs(["Default", "Teste"])
+
+    # tab1.write(yyy)
+    # tab2.write(y)

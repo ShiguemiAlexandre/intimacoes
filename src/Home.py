@@ -1,60 +1,31 @@
 import streamlit as st
-import magic
-
+from auth.authenticate import Authenticate
+import yaml
+from yaml.loader import SafeLoader
 from firebase import get_db
 
-st.set_page_config(
-    page_title='Intimações Juristecplus',
-    layout='centered',
-    initial_sidebar_state='expanded',
+import logging
+
+MODULE_LOGGER = logging.getLogger(__name__)
+
+with open('./config.yaml') as file:
+    config = yaml.load(file, Loader=SafeLoader)
+
+authenticator = Authenticate(
+    cookie_name = config['cookie']['name'],
+    key = config['cookie']['key'],
+    cookie_expiry_days = config['cookie']['expiry_days'],
+    preauthorized = config['preauthorized']
 )
 
-st.header("Upload de Arquivos")
-
-file_upload = st.file_uploader(
-    "Selecione um arquivo",
-    accept_multiple_files=True,
-    type=['.xlsx'],
-)
-
-client_folder = 'CBS'
-_, storage, _ = get_db()
-
-if file_upload is not None:
-    ready=False
-    for _file in file_upload:
-        fname = f'{client_folder}/{_file.name}'
-
-        # verificando se arquivo ja existe
-        blob = storage.get_blob(fname)
-        if blob:
-            st.error(''.join((
-                f'Arquivo "',
-                fname.split('/')[-1],
-                '" já existe, remova-o do ',
-                'repositório antes de fazer upload novamente'
-                )))
-            st.stop()
-            
-        # Validando o tipo do arquivo
-        data_bytes = _file.getvalue()
-        ext = magic.from_buffer(
-            buffer=data_bytes,
-            mime=True
-        )
-        blob = storage.blob(fname)
-        blob.upload_from_string(
-            data=data_bytes,
-            content_type=ext
-        )
-        ready=True
-    
-    if ready:
-        st.switch_page('pages/Repositório.py')
-    # bytes_data = BytesIO()
-
-    # df = pd.read_excel(bytes_data, engine='openpyxl')
-    # print(df)
+name, authentication_status, username = authenticator.login("Login", "sidebar")
 
 
+if authentication_status == None:
+    st.stop()
+elif authentication_status == False:    
+    st.sidebar.error("Email ou senha inválidos. Por favor, verifique suas credenciais e tente novamente.")
+    st.toast("❌Email ou senha inválidos. Por favor, verifique suas credenciais e tente novamente.")
+    st.stop()
 
+authenticator.logout('Logout', 'sidebar', key='finalizar')
