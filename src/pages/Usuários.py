@@ -3,6 +3,11 @@ import streamlit as st
 import time
 import secrets
 
+
+if st.session_state["authentication_status"] != True:
+    st.title("Favor realizar login para acessar esta página 🔐")
+    st.stop()
+
 def delet_user(id: str, email: str):
     auth.delete_user(id)
 
