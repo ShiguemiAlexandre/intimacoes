@@ -31,17 +31,30 @@ def is_gce_instance():
 
 @st.cache_resource
 def get_db():
-    if is_gce_instance():
-        firebase_app = firebase_admin.initialize_app()
-    else:
+
+    try:
+        app = firebase_admin.get_app()
+    except ValueError as e:
         fbpath = os.getenv('GLOBAL_PATH_FIREBASE_JSON')
         cred = credentials.Certificate(fbpath)
-        firebase_app = firebase_admin.initialize_app(cred)
+        firebase_admin.initialize_app(cred)
 
     firebase_db = firestore.client()
     firebase_storage = storage.bucket(os.getenv('BUCKET_NAME'))
 
     return firebase_db, firebase_storage, auth
+
+    # if is_gce_instance():
+    #     firebase_app = firebase_admin.initialize_app()
+    # else:
+    #     fbpath = os.getenv('GLOBAL_PATH_FIREBASE_JSON')
+    #     cred = credentials.Certificate(fbpath)
+    #     firebase_app = firebase_admin.initialize_app(cred)
+
+    # firebase_db = firestore.client()
+    # firebase_storage = storage.bucket(os.getenv('BUCKET_NAME'))
+
+    # return firebase_db, firebase_storage, auth
 
 FIRESTORE_TIMESTAMP = firestore.firestore.SERVER_TIMESTAMP
 FIRESTORE_DELETE_FIELD = firestore.firestore.DELETE_FIELD
