@@ -4,7 +4,12 @@ import pandas as pd
 from io import BytesIO
 import functions.similarity as similarity
 
+from functions.styles_pandas import color_dataframe
+
 from firebase import get_db
+
+if "authentication_status" not in st.session_state:
+    st.session_state["authentication_status"] = None
 
 if st.session_state["authentication_status"] != True:
     st.title("Favor realizar login para acessar esta página 🔐")
@@ -101,14 +106,16 @@ if compare_btn:
         dfx = pd.read_excel(datax)
         dftotal = pd.concat([dftotal, dfx], ignore_index=True)
 
-    if len(selected_blobs) == 2:
-        tab = st.tabs(["Filtrado", "Raw", "Filtrado GPT"])
-        df_filtred, df_raw = similarity.process(dftotal)
-        tab[0].dataframe(df_filtred)
-        tab[1].dataframe(df_raw)
-        
-        df_gpt = similarity.compare(df_filtred, dftotal)
-        tab[2].dataframe(df_gpt)
+    # dftotal é todos os arquivos selecionados menos o que foi selecionado no novo arquivo
+    # blob 0 é o novo arquivo
+
+    tab = st.tabs(["Filtrado GPT", "Filtrado", "Raw"])
+    df_filtred, df_raw = similarity.process(dftotal)
+    df_gpt = similarity.compare(df_filtred, df0)
+    
+    tab[1].dataframe(color_dataframe(df_filtred, "SIMILAR"))
+    tab[2].dataframe(color_dataframe(df_raw, "SIMILAR"))
+    tab[0].dataframe(color_dataframe(df_gpt, "GPTSIMILAR"))
 
 
     # d1.write(', '.join(names))

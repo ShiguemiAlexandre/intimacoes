@@ -7,6 +7,8 @@ import numpy as np
 import json
 from openai import OpenAI
 from dotenv import load_dotenv
+import streamlit as st
+import time
 
 from nltk.corpus import stopwords
 from nltk.tokenize import word_tokenize
@@ -44,18 +46,6 @@ def calculate_similarity(text1, text2):
     #         score[i, j] = calculate_similarity(df0.iloc[i][TARGET], df1.iloc[j][TARGET])
     # for i in range(len(df0)):
     #     print(score[i])
-
-def color_dataframe(
-        dataframe: pd.DataFrame,
-        name_col: str,
-        color: str = "red",
-        value_colored: float = -1
-    ) -> pd.DataFrame:
-    def apply_color(row):
-        return [f"background-color: {color}" if row[name_col] == value_colored else "" for _ in row]
-
-    # Aplica a função de estilo ao DataFrame
-    return dataframe.style.apply(apply_color, axis=1)
 
 
 def process(df0: pd.DataFrame):
@@ -161,9 +151,6 @@ def process(df0: pd.DataFrame):
         ]
     )
 
-    df0 = color_dataframe(dataframe=df0, name_col="SIMILAR")
-    df00 = color_dataframe(dataframe=df00, name_col="SIMILAR")
-
     # df0.reset_index().to_excel('output_raw.xlsx', index=False)
     # df00.reset_index().to_excel('output_filtered.xlsx', index=False)
 
@@ -180,7 +167,11 @@ def compare(df0: pd.DataFrame, df1: pd.DataFrame):
     # print(len(procs), len(procs['Processo'].unique().tolist()), len(df0['Processo'].unique().tolist()), len(df1['Processo'].unique().tolist()))
 
     df1['GPTSIMILAR'] = -1
-    for p in procs['Processo'].unique().tolist():
+    progress_text = "Operation in progress. Please wait."
+    my_bar = st.progress(0, text=progress_text)
+    size_bar_progress = round(len(procs['Processo'].unique().tolist()) / 100)
+
+    for index_df, p in enumerate(procs['Processo'].unique().tolist()):
         df00 = df0[df0['Processo'] == p]
         df11 = df1[df1['Processo'] == p]
         print(p, len(df00), len(df11))
@@ -214,9 +205,15 @@ def compare(df0: pd.DataFrame, df1: pd.DataFrame):
                     # print(repr(original))
                     # print('>', repr(edited))
                     break
+        time.sleep(0.01)
+        if index_df + size_bar_progress > 100:
+            value_process = 100
+        else:
+            value_process = index_df + size_bar_progress 
+        my_bar.progress(value_process, text=progress_text)
+    
 
     # print(len(df1[df1['GPTSIMILAR']>=0]),'processos encontrados no dia anterior\n', len(df1[df1['GPTSIMILAR']<0]), 'processos novos\ntotal de processos novos', len(df1))
-    df1 = color_dataframe(dataframe=df1, name_col="GPTSIMILAR")
     return df1
 
 
