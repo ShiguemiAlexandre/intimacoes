@@ -1,4 +1,5 @@
 import pandas as pd
+from datetime import datetime
 
 def color_dataframe(
         dataframe: pd.DataFrame,
@@ -11,3 +12,10 @@ def color_dataframe(
 
     # Aplica a função de estilo ao DataFrame
     return dataframe.style.apply(apply_color, axis=1)
+
+def datetime_isoformat_tratament(
+        data: str
+    ) -> str:
+    data_raw = data.split(".")[0]
+    data_raw = " ".join(data_raw.split("T"))
+    return data_raw

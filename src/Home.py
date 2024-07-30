@@ -30,3 +30,4 @@ elif authentication_status == False:
     st.stop()
 
 authenticator.logout('Logout', 'sidebar', key='finalizar')
+

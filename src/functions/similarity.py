@@ -167,8 +167,9 @@ def compare(df0: pd.DataFrame, df1: pd.DataFrame):
     # print(len(procs), len(procs['Processo'].unique().tolist()), len(df0['Processo'].unique().tolist()), len(df1['Processo'].unique().tolist()))
 
     df1['GPTSIMILAR'] = -1
-    progress_text = "Operation in progress. Please wait."
-    my_bar = st.progress(0, text=progress_text)
+
+    progress_text = "Analisando o processo {}, status: {}/{} completado."
+    my_bar = st.progress(0, text=progress_text.format("", 0, len(procs['Processo'].unique())))
     size_bar_progress = round(len(procs['Processo'].unique().tolist()) / 100)
 
     for index_df, p in enumerate(procs['Processo'].unique().tolist()):
@@ -180,8 +181,6 @@ def compare(df0: pd.DataFrame, df1: pd.DataFrame):
 
             for j in df00.index:
                 edited = df00.loc[j, TARGET]
-                # print(repr(original[:100]))
-                # print('>', repr(edited[:100]))
             
                 msg = f'Compare text0="{original}" with text1="{edited}" and return a json object containing only a boolean value if text0 and text1 has same story in field called "same_story", another bollean for same goal in field called "same_goal", another bollean for same litigation into field called "same_litigation", another field litigation-id with process code'
 
@@ -206,12 +205,14 @@ def compare(df0: pd.DataFrame, df1: pd.DataFrame):
                     # print('>', repr(edited))
                     break
         time.sleep(0.01)
+
         if index_df + size_bar_progress > 100:
             value_process = 100
         else:
             value_process = index_df + size_bar_progress 
-        my_bar.progress(value_process, text=progress_text)
-    
+
+        my_bar.progress(value_process, text=progress_text.format(p, index_df, len(procs['Processo'].unique())))
+        my_bar.empty()
 
     # print(len(df1[df1['GPTSIMILAR']>=0]),'processos encontrados no dia anterior\n', len(df1[df1['GPTSIMILAR']<0]), 'processos novos\ntotal de processos novos', len(df1))
     return df1

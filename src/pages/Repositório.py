@@ -1,10 +1,13 @@
 import streamlit as st
 import numpy as np
 import pandas as pd
+import time
 from io import BytesIO
 import functions.similarity as similarity
+from streamlit_modal import Modal
+from functions.tratament_data import datetime_isoformat_tratament
 
-from functions.styles_pandas import color_dataframe
+from functions.tratament_data import color_dataframe
 
 from firebase import get_db
 
@@ -22,7 +25,7 @@ st.set_page_config(
 
 # st.header("Arquivos disponíveis")
 header = st.container()
-toolbar = st.columns([1,2,1])
+toolbar = st.columns([1, 1, 1, 1, 1])
 
 mainbody1 = st.expander('Seleção de arquivos', expanded=True)
 m1, m2 = mainbody1.columns([1,1])
@@ -52,6 +55,18 @@ compare_btn = toolbar[0].button(
     disabled=compare_btn_disabled
 )
 
+modal_details = Modal(
+    title="Detalhes do arquivo",
+    key="details_file"
+)
+details_btn_disabled = np.sum(selected)==1
+details_btn = toolbar[2].button(
+    label="Detalhes",
+    key="details_btn",
+    disabled=not details_btn_disabled
+)
+
+
 delete_btn_disabled = np.sum(selected)==0
 delete_btn = toolbar[-1].button(
     label="Apagar",
@@ -67,13 +82,7 @@ new_btn = m2.selectbox(
     disabled=new_btn_disabled
 )
 
-
 ########################################################################
-if delete_btn:
-    for k, blob in enumerate(blobs):
-        if selected[k]:
-            blob.delete()
-            st.rerun()
 
 if compare_btn:
     d1, d2 = mainbody2.columns([1,1])
@@ -129,3 +138,37 @@ if compare_btn:
 
     # tab1.write(yyy)
     # tab2.write(y)
+
+if details_btn:
+    modal_details.open()
+
+if modal_details.is_open():
+    with modal_details.container():
+        columns = st.columns([1, 1, 1])
+        for k, blob in enumerate(blobs):
+            if selected[k]:
+                columns[1].text_input(
+                    label="Upload feito por:",
+                    value=blob.metadata["owner"],
+                    key="owner",
+                    disabled=True,
+                )
+                columns[1].text_input(
+                    label="Arquivo feito por:",
+                    value=datetime_isoformat_tratament(blob.metadata["upload_time"]),
+                    key="time-file",
+                    disabled=True,
+                )
+                st.divider()
+                
+
+if delete_btn:
+    list_blobs_delet = []
+    for k, blob in enumerate(blobs):
+        if selected[k]:
+            list_blobs_delet.append(blob)
+            blob.delete()
+    for x in list_blobs_delet:
+        st.toast("Arquivo %s deletado" % x.name)
+        time.sleep(1)
+    st.rerun()

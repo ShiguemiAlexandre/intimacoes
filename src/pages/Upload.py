@@ -1,7 +1,8 @@
 import streamlit as st
 import magic
-
+from datetime import datetime
 from firebase import get_db
+
 
 if "authentication_status" not in st.session_state:
     st.session_state["authentication_status"] = None
@@ -50,6 +51,10 @@ if file_upload is not None:
             mime=True
         )
         blob = storage.blob(fname)
+        blob.metadata = {
+            "owner": st.session_state["username"],
+            "upload_time": datetime.now().isoformat()
+        }
         blob.upload_from_string(
             data=data_bytes,
             content_type=ext
