@@ -1,7 +1,7 @@
 import streamlit as st
 import magic
 from datetime import datetime
-from firebase import get_db
+from intimacoes.src.firebase import get_db
 
 
 if "authentication_status" not in st.session_state:

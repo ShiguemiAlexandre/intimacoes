@@ -13,7 +13,7 @@ from .exceptions import CredentialsError, ForgotError, RegisterError, ResetError
 
 # Authentication GCP API
 # from firebase_admin import auth
-from firebase import get_db
+from intimacoes.src.firebase import get_db
 
 import os
 import requests
@@ -118,7 +118,7 @@ class Authenticate:
         request = requests.post(
             self.url_api % "signInWithPassword",
             params={
-                "key": os.environ["KEY_API_GPC"]
+                "key": os.environ["KEY_API_GCP"]
             },
             data={
                 "email": self.username,
@@ -186,6 +186,9 @@ class Authenticate:
                 else:
                     return False
         except Exception as e:
+            if e.args[0] == "KEY_API_GCP":
+                st.toast("⚠️ Error 404, GCP_KEY")
+                st.stop()
             print(e)
         
 

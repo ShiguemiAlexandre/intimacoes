@@ -3,13 +3,13 @@ import numpy as np
 import pandas as pd
 import time
 from io import BytesIO
-import functions.similarity as similarity
+import intimacoes.src.functions.similarity as similarity
 from streamlit_modal import Modal
-from functions.tratament_data import datetime_isoformat_tratament
+from intimacoes.src.functions.tratament_data import datetime_isoformat_tratament
 
-from functions.tratament_data import color_dataframe
+from intimacoes.src.functions.tratament_data import color_dataframe
 
-from firebase import get_db
+from intimacoes.src.firebase import get_db
 
 if "authentication_status" not in st.session_state:
     st.session_state["authentication_status"] = None
