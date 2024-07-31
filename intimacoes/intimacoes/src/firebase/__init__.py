@@ -31,7 +31,6 @@ def is_gce_instance():
 
 @st.cache_resource
 def get_db():
-
     try:
         app = firebase_admin.get_app()
     except ValueError as e:
