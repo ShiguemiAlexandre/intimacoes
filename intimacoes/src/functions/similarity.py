@@ -193,7 +193,8 @@ def compare(df0: pd.DataFrame, df1: pd.DataFrame):
                         ]
                     )
                 except Exception as e:
-                    df1.loc[i, "GPTSIMILAR"] = "Error: {}".format(e)
+                    print(e)
+                    # df1.loc[i, "GPTSIMILAR"] = "Error: {}".format(e)
 
                 if "same_story" not in completion.choices[0].message.content and "same_goal" not in completion.choices[0].message.content and "same_litigation" not in completion.choices[0].message.content:
                     continue

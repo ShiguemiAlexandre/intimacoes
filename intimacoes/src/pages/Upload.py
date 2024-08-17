@@ -1,13 +1,10 @@
 import streamlit as st
 import magic
 from datetime import datetime
-from intimacoes.src.firebase import get_db
+from src.firebase import get_db
 
 
-if "authentication_status" not in st.session_state:
-    st.session_state["authentication_status"] = None
-
-if st.session_state["authentication_status"] != True:
+if "authentication_status" not in st.session_state or st.session_state["authentication_status"] is not True:
     st.title("Favor realizar login para acessar esta página 🔐")
     st.stop()
 
@@ -25,13 +22,13 @@ file_upload = st.file_uploader(
     type=['.xlsx'],
 )
 
-client_folder = 'CBS'
+CLIENT_FOLDER = 'CBS'
 _, storage, _ = get_db()
 
 if file_upload is not None:
     ready=False
     for _file in file_upload:
-        fname = f'{client_folder}/{_file.name}'
+        fname = f'{CLIENT_FOLDER}/{_file.name}'
 
         # verificando se arquivo ja existe
         blob = storage.get_blob(fname)

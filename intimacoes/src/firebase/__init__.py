@@ -1,8 +1,10 @@
 # -*- coding: utf-8 -*-
+import firebase_admin.firestore
 import streamlit as st
 import socket
 import os
 from dotenv import load_dotenv
+from typing import Tuple
 
 import firebase_admin
 from firebase_admin import (  # noqa: F401
@@ -42,18 +44,6 @@ def get_db():
     firebase_storage = storage.bucket(os.getenv('BUCKET_NAME'))
 
     return firebase_db, firebase_storage, auth
-
-    # if is_gce_instance():
-    #     firebase_app = firebase_admin.initialize_app()
-    # else:
-    #     fbpath = os.getenv('GLOBAL_PATH_FIREBASE_JSON')
-    #     cred = credentials.Certificate(fbpath)
-    #     firebase_app = firebase_admin.initialize_app(cred)
-
-    # firebase_db = firestore.client()
-    # firebase_storage = storage.bucket(os.getenv('BUCKET_NAME'))
-
-    # return firebase_db, firebase_storage, auth
 
 FIRESTORE_TIMESTAMP = firestore.firestore.SERVER_TIMESTAMP
 FIRESTORE_DELETE_FIELD = firestore.firestore.DELETE_FIELD

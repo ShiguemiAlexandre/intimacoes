@@ -1,12 +1,13 @@
 import pandas as pd
-from datetime import datetime
+import io
+import zipfile
 
 def color_dataframe(
-        dataframe: pd.DataFrame,
-        name_col: str,
-        color: str = "red",
-        value_colored: float = -1
-    ) -> pd.DataFrame:
+    dataframe: pd.DataFrame,
+    name_col: str,
+    color: str = "red",
+    value_colored: float = -1
+) -> pd.DataFrame:
     def apply_color(row):
         return [f"background-color: {color}" if row[name_col] == value_colored else "" for _ in row]
 

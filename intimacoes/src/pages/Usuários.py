@@ -1,12 +1,9 @@
-from firebase import get_db
+from src.firebase import get_db
 import streamlit as st
 import time
 import secrets
 
-if "authentication_status" not in st.session_state:
-    st.session_state["authentication_status"] = None
-
-if st.session_state["authentication_status"] != True:
+if "authentication_status" not in st.session_state or st.session_state["authentication_status"] is not True:
     st.title("Favor realizar login para acessar esta página 🔐")
     st.stop()
 
