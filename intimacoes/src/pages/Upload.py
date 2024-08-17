@@ -1,7 +1,11 @@
 import streamlit as st
 import magic
 from datetime import datetime
+<<<<<<< HEAD:intimacoes/src/pages/Upload.py
 from src.firebase import get_db
+=======
+from intimacoes.src.firebase import get_db
+>>>>>>> 6ac798d58cb8893d62601410105c6c9673b837e8:intimacoes/intimacoes/src/pages/Upload.py
 
 
 if "authentication_status" not in st.session_state or st.session_state["authentication_status"] is not True:
