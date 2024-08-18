@@ -13,11 +13,7 @@ from .exceptions import CredentialsError, ForgotError, RegisterError, ResetError
 
 # Authentication GCP API
 # from firebase_admin import auth
-<<<<<<< HEAD:intimacoes/src/auth/authenticate.py
-from src.firebase import get_db
-=======
 from intimacoes.src.firebase import get_db
->>>>>>> 6ac798d58cb8893d62601410105c6c9673b837e8:intimacoes/intimacoes/src/auth/authenticate.py
 
 import os
 import requests

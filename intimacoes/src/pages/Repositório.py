@@ -56,7 +56,8 @@ def upload_dataframe_compareded():
         "owner": st.session_state["username"],
         "compare_date": datetime.datetime.now().isoformat(),
         "list_files_compare": names,
-        "list_generation_compare": generation
+        "list_generation_compare": generation,
+        "path_storage": st.session_state["path_storage"]
     }
 
     blob_storage.metadata = dict_data_file
